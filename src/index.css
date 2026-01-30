@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Renovafácil Dark Theme */
+    --background: 220 20% 4%;
+    --foreground: 0 0% 95%;
+    --card: 220 20% 6%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 20% 6%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 267 75% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 267 75% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 267 75% 60%;
+    --radius: 0.75rem;
+    
+    /* Brand Colors */
+    --renova-verde: #3D6B4B;
+    --renova-verde-light: #4a8259;
+    --renova-azul: #2D8BC9;
+    --renova-azul-dark: #1a5a8a;
+    --ai-purple: #a855f7;
+  }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 267 75% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 94%;
+    --secondary-foreground: 220 20% 10%;
+    --muted: 220 15% 90%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 267 75% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 85%;
+    --input: 220 15% 85%;
+    --ring: 267 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, 
+      hsl(220 20% 4%) 0%, 
+      hsl(220 20% 6%) 50%, 
+      hsl(220 25% 8%) 100%
+    );
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Glass effect */
+  .glass {
+    @apply bg-black/30 backdrop-blur-xl;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#a855f7] to-[#c084fc];
+  }
+  
+  /* Card glow */
+  .card-glow {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Selection */
+::selection {
+  background: rgba(168, 85, 247, 0.3);
+}
+
+/* Focus visible */
+:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

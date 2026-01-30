@@ -1,0 +1,266 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Renovafácil Brand Colors */
+  --renova-verde: #3D6B4B;
+  --renova-verde-light: #4a8259;
+  --renova-azul: #2D8BC9;
+  --renova-azul-dark: #1a5a8a;
+  
+  /* Funnel Colors */
+  --funnel-tof: #ff6b35;
+  --funnel-mof: #ffd700;
+  --funnel-bof: #4ade80;
+  --funnel-metralleta: #ec4899;
+  --funnel-hibrido: #8b5cf6;
+  
+  /* AI Accent */
+  --ai-purple: #a855f7;
+  --ai-purple-light: #c084fc;
+}
+
+/* Dark theme (default) */
+.dark {
+  --background: 220 20% 4%;
+  --foreground: 0 0% 95%;
+  --card: 220 20% 6%;
+  --card-foreground: 0 0% 95%;
+  --popover: 220 20% 6%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 267 75% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 12%;
+  --secondary-foreground: 0 0% 95%;
+  --muted: 220 15% 18%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 267 75% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --ring: 267 75% 60%;
+  --radius: 0.75rem;
+}
+
+/* Light theme */
+.light {
+  --background: 0 0% 98%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 20% 10%;
+  --primary: 267 75% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 15% 94%;
+  --secondary-foreground: 220 20% 10%;
+  --muted: 220 15% 90%;
+  --muted-foreground: 220 10% 45%;
+  --accent: 267 75% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 15% 85%;
+  --input: 220 15% 85%;
+  --ring: 267 75% 55%;
+  --radius: 0.75rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, 
+    hsl(var(--background)) 0%, 
+    hsl(220 20% 6%) 50%, 
+    hsl(220 25% 8%) 100%
+  );
+  min-height: 100vh;
+  color: hsl(var(--foreground));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.5); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 80%, rgba(45, 139, 201, 0.1) 0%, transparent 50%);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(15, 25, 15, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Button animations */
+button {
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Input focus effects */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.3);
+}
+
+/* Badge styles */
+.badge-funnel-tof { background-color: var(--funnel-tof); }
+.badge-funnel-mof { background-color: var(--funnel-mof); color: #000; }
+.badge-funnel-bof { background-color: var(--funnel-bof); color: #000; }
+.badge-funnel-metralleta { background-color: var(--funnel-metralleta); }
+.badge-funnel-hibrido { background-color: var(--funnel-hibrido); }
+
+/* AIDA section colors */
+.aida-atencion { border-left-color: var(--funnel-tof); }
+.aida-interes { border-left-color: var(--renova-azul); }
+.aida-deseo { border-left-color: var(--funnel-mof); }
+.aida-accion { border-left-color: var(--funnel-bof); }
+
+/* Loading spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Tooltip styles */
+[data-radix-popper-content-wrapper] {
+  z-index: 100;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(168, 85, 247, 0.3);
+  color: inherit;
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 30%;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
