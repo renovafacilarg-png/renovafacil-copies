@@ -21,13 +21,13 @@ export function BatchGenerator() {
   const [batchResults, setBatchResults] = useState<GeneratedCopy[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex] = useState(0);
   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [failedIndices, setFailedIndices] = useState<number[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   
-  const { generateCopy, generateMultipleCopies } = useGemini();
+  const { generateMultipleCopies } = useGemini();
   const { generateSpeech, play, pause, isPlaying } = useAudio();
   const { exportToHTML, exportBatchForEditor, exportBatchForAudioGeneration } = useExport();
   const { addBatch } = useHistory();
