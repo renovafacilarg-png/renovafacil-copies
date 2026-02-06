@@ -96,6 +96,7 @@ RESPONDE SOLO CON JSON: {"atencion": "...", "visual_atencion": "...", "interes":
             generationConfig: {
               temperature: 0.9,
               maxOutputTokens: maxOutputTokens,
+              responseMimeType: 'application/json',
             }
           })
         });
@@ -109,7 +110,7 @@ RESPONDE SOLO CON JSON: {"atencion": "...", "visual_atencion": "...", "interes":
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 contents: [{ parts: [{ text: SYSTEM_PROMPT + '\n\n' + prompt }] }],
-                generationConfig: { temperature: 0.9, maxOutputTokens: maxOutputTokens }
+                generationConfig: { temperature: 0.9, maxOutputTokens: maxOutputTokens, responseMimeType: 'application/json' }
               })
             });
             
@@ -251,6 +252,11 @@ El array debe tener exactamente ${configs.length} elementos.`;
       
       console.log('[DEBUG] Raw multi-response:', response);
       
+      // Si la respuesta está vacía o muy corta, hay un problema
+      if (!response || response.length < 100) {
+        throw new Error('La respuesta de Gemini está vacía o incompleta. Probablemente límite de cuota excedido.');
+      }
+      
       let parsed: any;
       try {
         // Limpiar la respuesta
@@ -293,6 +299,7 @@ El array debe tener exactamente ${configs.length} elementos.`;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      console.error('[DEBUG] Error en generateMultipleCopies:', errorMessage);
       setState({ isLoading: false, error: errorMessage });
       throw err;
     }
