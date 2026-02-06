@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import type { GeneratedCopy } from '@/types';
 import jsPDF from 'jspdf';
+import { VOICE_GUIDE_TEXT } from '@/data/prompts';
 
 export function useExport() {
   const exportToHTML = useCallback((copies: GeneratedCopy[], filename: string) => {
@@ -131,6 +132,12 @@ export function useExport() {
       .full-copy { padding: 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1); }
       .full-copy-label { font-size: 0.75rem; font-weight: 700; color: var(--verde); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
       .full-copy-text { font-size: 0.95rem; line-height: 1.7; color: var(--text); padding: 15px; background: rgba(61,107,75,0.1); border-radius: 8px; border: 1px solid rgba(61,107,75,0.3); }
+      .voice-prompt-section { background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(236,72,153,0.1)); border: 1px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px; }
+      .voice-prompt-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+      .voice-prompt-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: #a855f7; }
+      .voice-prompt-subtitle { font-size: 0.8rem; color: var(--muted); margin-bottom: 15px; }
+      .voice-prompt-text { font-size: 0.85rem; line-height: 1.7; color: var(--text); padding: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: 3px solid #a855f7; white-space: pre-wrap; font-family: 'Space Grotesk', monospace; }
+      .copy-button-hint { font-size: 0.75rem; color: #a855f7; margin-top: 10px; text-align: right; font-style: italic; }
       .footer { text-align: center; padding: 30px; color: var(--muted); font-size: 0.8rem; }
       @media print { body { background: white; color: black; } .video-card { break-inside: avoid; border: 1px solid #ccc; } }
     </style>
@@ -141,6 +148,15 @@ export function useExport() {
         <h1>📋 Planilla para Editora</h1>
         <div>${new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
         <div style="margin-top: 15px; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; display: inline-block; font-weight: 600;">📹 ${copies.length} videos para editar</div>
+    </div>
+    <div class="voice-prompt-section">
+        <div class="voice-prompt-header">
+            <span style="font-size: 1.5rem;">🎙️</span>
+            <span class="voice-prompt-title">PROMPT DE VOZ - ELEVENLABS / AI STUDIO</span>
+        </div>
+        <div class="voice-prompt-subtitle">Copiá y pegá este prompt en ElevenLabs para generar el audio de los videos:</div>
+        <div class="voice-prompt-text">${VOICE_GUIDE_TEXT}</div>
+        <div class="copy-button-hint">Seleccioná todo el texto del recuadro y pegalo en ElevenLabs</div>
     </div>
     ${videosHTML}
     <div class="footer">
@@ -257,6 +273,14 @@ export function useExport() {
 📹 Total de videos: ${copies.length}
 ${'='.repeat(60)}
 
+🎙️ PROMPT DE VOZ PARA ELEVENLABS / AI STUDIO
+${'─'.repeat(50)}
+Copiá y pegá este prompt en ElevenLabs para generar el audio:
+
+${VOICE_GUIDE_TEXT}
+
+${'='.repeat(60)}
+
 `;
 
     copies.forEach((copy, i) => {
@@ -305,10 +329,21 @@ ${'='.repeat(60)}
   }, []);
 
   const exportBatchForAudioGeneration = useCallback((copies: GeneratedCopy[], filename: string) => {
-    // Crear texto limpio con solo los copies uno debajo del otro
+    // Crear texto con prompt de voz + copies
     const allTexts = copies.map(copy => copy.fullText).join('\n\n');
-    
-    const content = allTexts;
+
+    const content = `🎙️ PROMPT DE VOZ PARA ELEVENLABS / AI STUDIO
+${'─'.repeat(50)}
+Copiá y pegá este prompt en ElevenLabs:
+
+${VOICE_GUIDE_TEXT}
+
+${'='.repeat(60)}
+
+📝 COPIES PARA GENERAR AUDIO:
+${'─'.repeat(50)}
+
+${allTexts}`;
 
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
