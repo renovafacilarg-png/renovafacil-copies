@@ -120,7 +120,7 @@ export function ApiKeyManager() {
           <div className="flex items-center justify-between">
             <Label className="flex items-center gap-2 text-sm font-medium text-foreground/90">
               <Key className="w-4 h-4" />
-              API Key de Gemini (Generación de Copies) <span className="text-xs text-muted-foreground ml-1">v4.3</span>
+              API Key de Gemini (Generación de Copies) <span className="text-xs text-muted-foreground ml-1">v4.5</span>
             </Label>
             <a 
               href="https://aistudio.google.com/app/apikey" 

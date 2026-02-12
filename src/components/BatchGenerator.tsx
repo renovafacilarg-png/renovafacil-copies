@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, Copy, Volume2, FileText, Check } from 'lucide-react';
+import { Package, Copy, Volume2, FileText, Check, Activity, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,7 @@ export function BatchGenerator() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [failedIndices, setFailedIndices] = useState<number[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const [diagnosticResult, setDiagnosticResult] = useState<{status: 'idle' | 'testing' | 'success' | 'error', message: string}>({status: 'idle', message: ''});
   
   const { generateMultipleCopies } = useGemini();
   const { generateSpeech, play, pause, isPlaying } = useAudio();
@@ -74,6 +75,10 @@ export function BatchGenerator() {
       
       console.log('[DEBUG] Received', copies.length, 'copies');
       
+      if (!copies || copies.length === 0) {
+        throw new Error('No se recibieron copies de Gemini. Verificá tu API key y cuota.');
+      }
+      
       setBatchResults(copies);
       setProgress(100);
       
@@ -84,7 +89,7 @@ export function BatchGenerator() {
       const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
       console.error('Error generando batch:', err);
       setErrors([errorMsg]);
-      setFailedIndices([0, 1, 2, 3, 4, 5].slice(0, count));
+      setFailedIndices(Array.from({length: count}, (_, i) => i));
     }
     
     setIsGenerating(false);
@@ -132,6 +137,49 @@ export function BatchGenerator() {
     exportBatchForAudioGeneration(batchResults, 'copies_para_audio');
   };
 
+  const runDiagnostic = async () => {
+    setDiagnosticResult({status: 'testing', message: 'Verificando conexión con Gemini...'});
+    
+    try {
+      // Verificar si hay API key
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) {
+        setDiagnosticResult({status: 'error', message: '❌ No se encontró API key. Pegala en la sección de arriba y hacé clic en "Probar".'});
+        return;
+      }
+
+      // Limpiar la key (por si tiene comillas)
+      let cleanKey = apiKey;
+      try {
+        cleanKey = JSON.parse(apiKey);
+      } catch {
+        cleanKey = apiKey.replace(/^"|"$/g, '');
+      }
+
+      // Hacer un test simple
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${cleanKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: 'Decime "OK"' }] }],
+          generationConfig: { maxOutputTokens: 10 }
+        })
+      });
+
+      if (response.ok) {
+        setDiagnosticResult({status: 'success', message: '✅ Todo funciona correctamente. Podés generar copies.'});
+      } else if (response.status === 429) {
+        setDiagnosticResult({status: 'error', message: '❌ Límite de cuota excedido (429). Esperá unos minutos o usá otra API key.'});
+      } else if (response.status === 400) {
+        setDiagnosticResult({status: 'error', message: '❌ API key inválida. Verificá que la copiaste bien desde Google AI Studio.'});
+      } else {
+        setDiagnosticResult({status: 'error', message: `❌ Error ${response.status}. Intentá de nuevo más tarde.`});
+      }
+    } catch (err) {
+      setDiagnosticResult({status: 'error', message: `❌ Error de conexión: ${err instanceof Error ? err.message : 'Desconocido'}`});
+    }
+  };
+
   const funnelColors: Record<string, string> = {
     tof: '#ff6b35',
     mof: '#ffd700',
@@ -174,6 +222,50 @@ export function BatchGenerator() {
           </Select>
         </div>
       </div>
+
+      {/* Diagnostic Button */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={runDiagnostic} 
+          variant="outline" 
+          size="sm"
+          className="text-xs border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-400"
+          disabled={diagnosticResult.status === 'testing'}
+        >
+          {diagnosticResult.status === 'testing' ? (
+            <>
+              <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+              Verificando...
+            </>
+          ) : (
+            <>
+              <Activity className="w-3 h-3 mr-2" />
+              🔍 Verificar conexión antes de generar
+            </>
+          )}
+        </Button>
+      </div>
+
+      {diagnosticResult.status !== 'idle' && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-3 rounded-lg text-sm ${
+            diagnosticResult.status === 'success' 
+              ? 'bg-green-500/10 border border-green-500/30 text-green-400' 
+              : diagnosticResult.status === 'error'
+              ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+              : 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {diagnosticResult.status === 'success' ? <Check className="w-4 h-4" /> :
+             diagnosticResult.status === 'error' ? <AlertCircle className="w-4 h-4" /> :
+             <Activity className="w-4 h-4 animate-pulse" />}
+            {diagnosticResult.message}
+          </div>
+        </motion.div>
+      )}
 
       {/* Generate Button */}
       <Button
@@ -305,14 +397,14 @@ export function BatchGenerator() {
             </div>
 
             {/* Errores */}
-            {failedIndices.length > 0 && (
+            {(failedIndices.length > 0 || errors.length > 0) && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="p-4 rounded-xl border border-red-500/30 bg-red-500/10"
               >
                 <h4 className="text-sm font-semibold text-red-400 mb-2">
-                  ⚠️ {failedIndices.length} video(s) no se pudieron generar:
+                  ⚠️ Error al generar copies:
                 </h4>
                 <ul className="text-xs text-red-300/80 space-y-1">
                   {errors.map((err, i) => (
@@ -320,7 +412,7 @@ export function BatchGenerator() {
                   ))}
                 </ul>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Probablemente por límite de cuota de Gemini. Intentá de nuevo en unos minutos o con otra API key.
+                  Probablemente por límite de cuota de Gemini (20 requests/día en tier gratuito). Intentá de nuevo en unos minutos o con otra API key.
                 </p>
               </motion.div>
             )}
